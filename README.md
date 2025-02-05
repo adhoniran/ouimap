@@ -34,7 +34,7 @@ OUImap is designed for developers, network analysts, and enthusiasts who need to
 
 If you want to build OUImap from source, you need:
 
-- Git
+- Git 2.47.1 (or higher).
 - Google Go 1.20 (or higher).
 - Internet connection to download the vendor database if no local copy exists or if your local copy is out of date.
 - Compatible operating system (Linux, macOS, or Windows).
