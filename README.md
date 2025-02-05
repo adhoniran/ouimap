@@ -94,13 +94,13 @@ $ ./ouimap
 
 The OUImap tool simplifies looking up OUIs and MAC address prefixes...
 
-*# Enter each search term pressing ENTER for a new term:*
+# Enter each search term pressing ENTER for a new term:
 
 suse linux
 0050.56
 00-19-1D-0F-DA-08
 
-*# Press ENTER on a blank line to start the search:*
+# Press ENTER on a blank line to start the search:
 
 Searching...
 
@@ -111,7 +111,7 @@ Searching...
 >> 3 record(s) found from your search parameters...
 >> Search completed in 253.819µs.
 
-*# Press CTRL+C to exit:*
+# Press CTRL+C to exit:
 ```
 
 If no results are found, the tool will display a message indicating that no matches were found.
