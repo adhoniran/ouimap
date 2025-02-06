@@ -62,7 +62,7 @@ sh build.run
 
 For Windows 11 (Powershell):
 ```powershell
-powershell -Command "Invoke-Expression (Get-Content -Raw .\build.run)"
+Invoke-Expression (Get-Content -Raw .\build.run)
 ```
 
 This will produce the “ouimap” executable (or “ouimap.exe” on Windows) in the same project folder.
