@@ -18,6 +18,7 @@ package main
 import (
 	"compress/gzip"
 	"fmt"
+	"github.com/schollz/progressbar/v3"
 	"io"
 	"net/http"
 	"os"
@@ -57,13 +58,19 @@ func downloadDatabase(url, tmp string) error {
 		}
 	}()
 
-	if _, err = io.Copy(tmpFile, resp.Body); err != nil {
+	bar := progressbar.NewOptions64(
+		resp.ContentLength,
+		progressbar.OptionSetDescription("Downloading OUI database"),
+		progressbar.OptionShowCount(),
+		progressbar.OptionShowBytes(true),
+	)
+
+	if _, err = io.Copy(io.MultiWriter(tmpFile, bar), resp.Body); err != nil {
 		return fmt.Errorf("failed to save data to temp file: %w", err)
 	}
 
 	return nil
 }
-
 func checkDatabase(file string) error {
 	db, err := os.Open(file)
 	if err != nil {

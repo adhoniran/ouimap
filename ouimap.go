@@ -59,7 +59,8 @@ func main() {
 		fmt.Println(err)
 	}
 	if updated {
-		fmt.Println(green + "OUImap database updated successfully!" + reset)
+		fmt.Println()
+		fmt.Println(green + "OUI database updated successfully!" + reset)
 	}
 
 	isNewer, latestVersion := checkNewVersion(githubOwner, githubRepo, appVersion)
