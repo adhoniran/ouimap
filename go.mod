@@ -4,6 +4,7 @@ go 1.23.4
 
 require (
 	github.com/schollz/progressbar/v3 v3.18.0
+	golang.org/x/mod v0.23.0
 	golang.org/x/term v0.28.0
 )
 
