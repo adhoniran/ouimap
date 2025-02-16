@@ -20,6 +20,8 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+
+	"golang.org/x/mod/semver"
 )
 
 type githubRelease struct {
@@ -35,22 +37,47 @@ func checkNewVersion(owner, repo, currentVersion string) (bool, string) {
 	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/releases/latest", owner, repo)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
+		fmt.Printf("HTTP request failed: %v\n", err)
 		return false, ""
 	}
+
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
+		fmt.Printf("HTTP request failed: %v\n", err)
 		return false, ""
 	}
-	defer resp.Body.Close()
+
+	defer func() { _ = resp.Body.Close() }()
+
 	if resp.StatusCode != http.StatusOK {
+		fmt.Printf("Unexpected status code: %d\n", resp.StatusCode)
 		return false, ""
 	}
+
 	var release githubRelease
 	if err := json.NewDecoder(resp.Body).Decode(&release); err != nil {
+		fmt.Printf("Failed to decode response: %v\n", err)
 		return false, ""
 	}
+
 	latestVersion := release.TagName
-	isNewer := strings.TrimPrefix(latestVersion, "v") != strings.TrimPrefix(currentVersion, "v")
-	return isNewer, latestVersion
+
+	if !strings.HasPrefix(latestVersion, "v") {
+		latestVersion = "v" + latestVersion
+	}
+	if !strings.HasPrefix(currentVersion, "v") {
+		currentVersion = "v" + currentVersion
+	}
+
+	if semver.IsValid(latestVersion) && semver.IsValid(currentVersion) {
+		cmp := semver.Compare(latestVersion, currentVersion)
+		if cmp > 0 {
+			return true, latestVersion
+		}
+	} else {
+		fmt.Printf("Invalid version format. currentVersion: %s, latestVersion: %s\n", currentVersion, latestVersion)
+	}
+
+	return false, latestVersion
 }
