@@ -39,13 +39,13 @@ func loadOUIDatabase(db string) error {
 	if err != nil {
 		return fmt.Errorf("error opening database: %w", err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	gz, err := gzip.NewReader(f)
 	if err != nil {
 		return fmt.Errorf("error reading database: %w", err)
 	}
-	defer gz.Close()
+	defer func() { _ = gz.Close() }()
 
 	scanner := bufio.NewScanner(gz)
 	for scanner.Scan() {

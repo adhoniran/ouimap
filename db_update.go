@@ -71,6 +71,7 @@ func downloadDatabase(url, tmp string) error {
 
 	return nil
 }
+
 func checkDatabase(file string) error {
 	db, err := os.Open(file)
 	if err != nil {
@@ -113,30 +114,26 @@ func replaceDatabase(db, tmp string) error {
 
 func updateDatabase() (bool, error) {
 
-	update := false
-
 	info, err := os.Stat(dbStorageFile)
 	if err == nil {
 		if time.Since(info.ModTime()) < 7*24*time.Hour {
-			return update, nil
+			return false, nil
 		}
 	} else if !os.IsNotExist(err) {
-
-		return update, err
+		return false, err
 	}
 
 	if err := downloadDatabase(dbUpdateURL, dbDownloadFile); err != nil {
-		return update, fmt.Errorf("failed to download OUI database: %w", err)
+		return false, fmt.Errorf("failed to download OUI database: %w", err)
 	}
 
 	if err := checkDatabase(dbDownloadFile); err != nil {
-		return update, fmt.Errorf("integrity check failed: %w", err)
+		return false, fmt.Errorf("integrity check failed: %w", err)
 	}
 
 	if err := replaceDatabase(dbStorageFile, dbDownloadFile); err != nil {
-		return update, fmt.Errorf("failed to replace database: %w", err)
+		return false, fmt.Errorf("failed to replace database: %w", err)
 	}
 
-	update = true
-	return update, nil
+	return true, nil
 }
