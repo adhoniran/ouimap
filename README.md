@@ -1,4 +1,6 @@
-# OUImap
+# OUImap 
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=adhoniran_ouimap&metric=alert_status)](https://sonarcloud.io/dashboard?id=adhoniran_ouimap)
 
 OUImap is a command-line (CLI) tool for querying Organizationally Unique Identifier (OUI) information and MAC address prefixes from an always up-to-date Wireshark database. It allows you to quickly look up which vendor is associated with a given MAC address (or part of it) and also supports text-based searches for vendor names.
 
