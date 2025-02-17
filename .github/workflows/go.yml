@@ -43,8 +43,8 @@ jobs:
       - name: Create Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: myapp-${{ matrix.os }}-${{ matrix.arch }}
-          path: myapp-${{ matrix.os }}-${{ matrix.arch }}*
+          name: $APPNAME-${{ matrix.os }}-${{ matrix.arch }}
+          path: $APPNAME-${{ matrix.os }}-${{ matrix.arch }}*
 
   release:
     needs: build
