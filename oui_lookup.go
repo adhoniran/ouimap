@@ -143,55 +143,87 @@ func lookupOUIData(searchParams []string) [][]string {
 	var results [][]string
 
 	for _, entry := range searchParams {
-		parsed, err := parseOUIEntry(entry)
-		if err == nil {
-			foundMap := make(map[string]bool)
-			foundAny := false
-
-			for _, record := range ouiRecords {
-				if compareOUIPrefixes(parsed.ouiPrefix, parsed.prefixLength, record.ouiPrefix, record.prefixLength) {
-					uniqueKey := fmt.Sprintf("%012X/%d", record.ouiPrefix, record.prefixLength)
-					if !foundMap[uniqueKey] {
-						results = append(results, []string{
-							formatMacPrefix(record.ouiPrefix, record.prefixLength),
-							record.vendorName,
-						})
-						foundMap[uniqueKey] = true
-					}
-					foundAny = true
-				}
-			}
-			if foundAny {
-				continue
-			}
-		} else {
-			clean := strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(entry, ":", ""), "-", ""), ".", "")
-			if len(clean) >= 2 && len(clean) < 6 && validateHex(clean) {
-				continue
-			}
+		if matches := searchOUIEntries(entry); len(matches) > 0 {
+			results = append(results, matches...)
+			continue
 		}
 
-		upperEntry := strings.ToUpper(entry)
-		vendorMap := make(map[string]bool)
-		for vend, plist := range vendorIndex {
-			if strings.Contains(vend, upperEntry) {
-				for _, p := range plist {
-					uniqueKey := fmt.Sprintf("%012X/%d", p.ouiPrefix, p.prefixLength)
-					if !vendorMap[uniqueKey] {
-						results = append(results, []string{
-							formatMacPrefix(p.ouiPrefix, p.prefixLength),
-							p.vendorName,
-						})
-						vendorMap[uniqueKey] = true
-					}
-				}
-			}
+		if partialHexEntry(entry) {
+			continue
+		}
+
+		if vendorMatches := searchVendorEntries(entry); len(vendorMatches) > 0 {
+			results = append(results, vendorMatches...)
 		}
 	}
+
 	fmt.Println(yellow)
 	return results
 }
 
+func searchOUIEntries(entry string) [][]string {
+	var matches [][]string
+	parsed, err := parseOUIEntry(entry)
+	if err != nil {
+		return matches
+	}
+
+	foundMap := make(map[string]bool)
+	for _, record := range ouiRecords {
+		if !compareOUIPrefixes(parsed.ouiPrefix, parsed.prefixLength, record.ouiPrefix, record.prefixLength) {
+			continue
+		}
+
+		uniqueKey := fmt.Sprintf("%012X/%d", record.ouiPrefix, record.prefixLength)
+		if foundMap[uniqueKey] {
+			continue
+		}
+
+		matches = append(matches, []string{
+			formatMacPrefix(record.ouiPrefix, record.prefixLength),
+			record.vendorName,
+		})
+		foundMap[uniqueKey] = true
+	}
+
+	return matches
+}
+
+func partialHexEntry(entry string) bool {
+	clean := strings.ReplaceAll(
+		strings.ReplaceAll(
+			strings.ReplaceAll(entry, ":", ""),
+			"-", ""),
+		".", "")
+	return len(clean) >= 2 && len(clean) < 6 && validateHex(clean)
+}
+
+func searchVendorEntries(entry string) [][]string {
+	var matches [][]string
+	vendorMap := make(map[string]bool)
+	upperEntry := strings.ToUpper(entry)
+
+	for vend, plist := range vendorIndex {
+		if !strings.Contains(vend, upperEntry) {
+			continue
+		}
+
+		for _, p := range plist {
+			uniqueKey := fmt.Sprintf("%012X/%d", p.ouiPrefix, p.prefixLength)
+			if vendorMap[uniqueKey] {
+				continue
+			}
+
+			matches = append(matches, []string{
+				formatMacPrefix(p.ouiPrefix, p.prefixLength),
+				p.vendorName,
+			})
+			vendorMap[uniqueKey] = true
+		}
+	}
+
+	return matches
+}
 func validateHex(inputString string) bool {
 	for i := 0; i < len(inputString); i++ {
 		c := inputString[i]
