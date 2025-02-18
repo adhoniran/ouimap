@@ -1,6 +1,7 @@
 # OUImap 
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=adhoniran_ouimap&metric=alert_status)](https://sonarcloud.io/dashboard?id=adhoniran_ouimap)
+[![Donate with PayPal](https://img.shields.io/badge/Donate%20with-PayPal-blue?logo=paypal&logoColor=white)](https://www.paypal.com/donate/?business=N6AH25Q2D4BL8&no_recurring=0&item_name=Contribute+to+the+future+of+our+projects.+Your+donation+via+PayPal+empowers+us+to+keep+creating+and+growing...+Thank+you%21&currency_code=USD)
 
 OUImap is a command-line (CLI) tool for querying Organizationally Unique Identifier (OUI) information and MAC address prefixes from an always up-to-date Wireshark database. It allows you to quickly look up which vendor is associated with a given MAC address (or part of it) and also supports text-based searches for vendor names.
 
@@ -151,3 +152,5 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 ## Donations
 
 Donations are greatly appreciated! You can make your contribution via the PayPal button below.
+
+[![Donate with PayPal](https://img.shields.io/badge/Donate%20with-PayPal-blue?logo=paypal&logoColor=white)](https://www.paypal.com/donate/?business=N6AH25Q2D4BL8&no_recurring=0&item_name=Contribute+to+the+future+of+our+projects.+Your+donation+via+PayPal+empowers+us+to+keep+creating+and+growing...+Thank+you%21&currency_code=USD)
