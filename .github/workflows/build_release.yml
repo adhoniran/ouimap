@@ -38,19 +38,25 @@ jobs:
       - name: Restore Go modules
         run: go mod tidy
 
-      # Extract version, commit, and app name
-      - name: Extract version, build, and app name
+      # Extract version, commit and app name
+      - name: Extract version, commit, and app name
         id: version
         run: |
-          # Extract version from the most recent tag or use "v0.0.0"
-          VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          # Use GitHub Actions context to extract version and commit
+          VERSION=${{ github.ref_name }}
+
+          if [[ "${{ github.ref_type }}" != "tag" ]]; then
+            echo "Error: Current GitHub ref is not a tag! Exiting."
+            exit 1
+          fi
 
           # Extract the 7-character short commit hash
           COMMIT=$(git rev-parse --short HEAD)
 
           # Set the app name based on the repository name
-          APPNAME=$(echo "${{ github.repository }}" | cut -d'/' -f2)
-          
+          APPNAME=$(basename "${{ github.repository }}")
+
+          # Export variables to environment
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
           echo "COMMIT=${COMMIT}" >> $GITHUB_ENV
           echo "APPNAME=${APPNAME}" >> $GITHUB_ENV
@@ -138,4 +144,3 @@ jobs:
             - Commit: ${{ env.COMMIT }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
