@@ -2,65 +2,138 @@ name: Build and Release
 
 on:
   push:
+    branches:
+      - main
     tags:
       - 'v*.*.*'
+
+permissions:
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
         os: [linux, windows, darwin]
         arch: [amd64, arm64]
 
     steps:
-      - name: Code Checkout
+      # Check out the code
+      - name: Check out code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          tags: true
 
-      - name: Configure Go
+      # Set up Go
+      - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.23.6'
+          go-version: '1.23.4'
+          cache: true
+          cache-dependency-path: go.sum
 
-      - name: Get Version e Commit Hash
+      # Restore Go Modules
+      - name: Restore Go modules
+        run: go mod tidy
+
+      # Extract version, commit, and app name
+      - name: Extract version, build, and app name
         id: version
         run: |
+          # Extract version from the most recent tag or use "v0.0.0"
           VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+
+          # Extract the 7-character short commit hash
           COMMIT=$(git rev-parse --short HEAD)
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "COMMIT=$COMMIT" >> $GITHUB_ENV
 
-      - name: Compile Application
+          # Set the app name based on the repository name
+          APPNAME=$(echo "${{ github.repository }}" | cut -d'/' -f2)
+          
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "COMMIT=${COMMIT}" >> $GITHUB_ENV
+          echo "APPNAME=${APPNAME}" >> $GITHUB_ENV
+        shell: bash
+
+      # Compile the application
+      - name: Build application
         run: |
-          APPNAME="ouimap"
-          OUTPUT="$APPNAME-${{ matrix.os }}-${{ matrix.arch }}"
-          [[ "${{ matrix.os }}" == "windows" ]] && OUTPUT="$OUTPUT.exe"
-          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -ldflags "-X main.appVersion=${{ env.VERSION }} -X main.appBuild=${{ env.COMMIT }}" -o $OUTPUT .
+          OUTPUT_DIR="output"
+          mkdir -p "$OUTPUT_DIR"
+          # Define the name of the binary
+          FILE="${OUTPUT_DIR}/${{ env.APPNAME }}"
+          
+          # Add .exe extension for Windows
+          [[ "${{ matrix.os }}" == "windows" ]] && FILE="${FILE}.exe"
 
-      - name: Create Artifacts
+          echo "Compiling for OS: ${{ matrix.os }}, Architecture: ${{ matrix.arch }}, Version: ${{ env.VERSION }}"
+
+          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} \
+          go build -ldflags "-X main.appVersion=${{ env.VERSION }} -X main.appBuild=${{ env.COMMIT }}" -o "$FILE" .
+
+          # Copy ouimap.db to the output directory
+          cp ouimap.db "$OUTPUT_DIR/"
+        
+      # Compress the output directory into a zip (Windows/macOS) or tar.gz (Linux)
+      - name: Compress outputs
+        run: |
+          OUTPUT_DIR="output"
+          ARTIFACTS_DIR="artifacts"
+          mkdir -p "$OUTPUT_DIR"
+          mkdir -p "$ARTIFACTS_DIR"
+
+          # Define the compressed file name
+          ARCHIVE_NAME="${{ env.APPNAME }}-${{ env.VERSION }}-${{ matrix.os }}-${{ matrix.arch }}"
+
+          # Compress based on OS
+          if [[ "${{ matrix.os }}" == "linux" ]]; then
+            tar -czf "${ARTIFACTS_DIR}/${ARCHIVE_NAME}.tar.gz" -C "$OUTPUT_DIR" .
+          else
+            zip -j "${ARTIFACTS_DIR}/${ARCHIVE_NAME}.zip" "$OUTPUT_DIR"/*
+          fi
+
+          # Clean up temporary files
+          rm -rf "$OUTPUT_DIR"
+
+      # List compressed artifacts
+      - name: List Artifacts
+        run: ls -lha artifacts/
+
+      # Upload compressed artifacts
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: $APPNAME-${{ matrix.os }}-${{ matrix.arch }}
-          path: $APPNAME-${{ matrix.os }}-${{ matrix.arch }}*
+          name: ${{ matrix.os }}-${{ matrix.arch }}
+          path: artifacts/
 
   release:
+    # Release depends on successful completion of the build job
     needs: build
     runs-on: ubuntu-latest
+
     steps:
-      - name: Download Artifacts
+      # Download all artifacts from the build job
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          path: ./artifacts
+          path: .artifacts/
 
-      - name: Create GitHub Release
+      # List downloaded artifacts
+      - name: List downloaded files
+        run: ls -R .artifacts/
+
+      # Create a release on GitHub
+      - name: Create a GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          files: ./artifacts/*
-          tag_name: ${{ env.VERSION }}
-          name: Release ${{ env.VERSION }}
-          body: "Version ${{ env.VERSION }} generated automatically."
+          files: ".artifacts/**/*"
+          tag_name: "${{ github.ref_name }}"
+          name: "Release ${{ github.ref_name }}"
+          body: |
+            Release ${{ github.ref_name }} has been automatically generated.
+            Linux / Windows / MacOS
+            AMD64 / ARM64
+            - Version: ${{ github.ref_name }}
+            - Commit: ${{ env.COMMIT }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
