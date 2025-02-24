@@ -23,6 +23,8 @@ jobs:
       # Check out the code
       - name: Check out code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       # Set up Go
       - name: Set up Go
