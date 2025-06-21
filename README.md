@@ -9,8 +9,7 @@ OUImap is a command-line (CLI) tool for querying Organizationally Unique Identif
 
 - [Overview](#overview)
 - [Main Features](#main-features)
-- [Requirements](#requirements)
-- [Installation](#installation)
+- [Build](#build)
 - [Usage](#usage)
 - [Execution Example](#execution-example)
 - [Automatic Updates](#automatic-updates)
