@@ -24,35 +24,39 @@ OUImap is designed for developers, network analysts, and enthusiasts who need to
 
 ## Main Features
 
-- Automatic download of the Wireshark vendor database.
-- Integrity check of the downloaded file.
-- Local storage and updating of the database.
-- MAC prefix (OUI) lookups in standardized formats (XX:XX:XX).
-- Support for various input formats (e.g., 00-50-56, 00:50:56, 001a.b623.3499, etc.).
-- Text-based search for vendor names (e.g., “Intel,” “Dell”).
-- Detailed results, including search time and total number of records found.
-- Simple and interactive command-line tool.
+- Automatic download of the Wireshark vendor database
+- Integrity check of the downloaded database file
+- Local storage and automatic database update
+- MAC prefix (OUI) lookups in standardized formats (XX:XX:XX)
+- Support for various input formats (e.g., 00-50-56, 00:50:56, 001a.b623.3499, etc.)
+- Text-based search for vendor names (e.g., “Intel,” “Dell”)
+- Detailed results, including the search time and the total number of records found
+- Simple and interactive command-line tool
 
-## Requirements
+## Build
+
+### Requirements
 
 If you want to build OUImap from source, you need:
 
 - Git 2.47.1 (or higher).
-- Google Go 1.23.4 (or higher).
+- Go compiler (version 1.23.4 or later), available at https://go.dev.
 - Internet connection to download the vendor database if no local copy exists or if your local copy is out of date.
-- Compatible operating system (Linux, macOS, or Windows).
-
-## Installation
+- Compatible operating system (Linux, macOS, Windows or any Go supported).
 
 ### Step 1: Clone the Repository
 
 If you want to compile from source:
 
 1. Clone the repository:
+   ```bash
    git clone https://github.com/adhoniran/ouimap.git ouimap
+   ```
 
 2. Go to the project folder:  
+   ```bash
    cd ouimap
+   ```
 
 ### Step 2: Compile
 
@@ -144,7 +148,7 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 
 Copyright (C) 2025 Adhonian Gomes
 
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License only.
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
