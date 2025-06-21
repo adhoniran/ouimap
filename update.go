@@ -17,26 +17,38 @@ package main
 
 import (
 	"compress/gzip"
+	"encoding/json"
 	"fmt"
-	"github.com/schollz/progressbar/v3"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
+
+	"github.com/schollz/progressbar/v3"
+	"golang.org/x/mod/semver"
+)
+
+const (
+	dbUpdateURL = "https://www.wireshark.org/download/automated/data/manuf.gz"
+	dbUpdateTMP = "ouimap.dl"
+	githubOwner = "adhoniran"
+	githubRepo  = "ouimap"
+	baseRepoURL = "https://github.com/%s/%s"
+	baseAPIURL  = "https://api.github.com/repos/%s/%s/releases/latest"
 )
 
 var (
-	dbUpdateURL    = "https://www.wireshark.org/download/automated/data/manuf.gz"
-	dbDownloadFile = "ouimap.dl"
-	exePath, _     = os.Executable()
-	dbStorageFile  = filepath.Join(filepath.Dir(exePath), "ouimap.db")
+	appPath, _ = os.Executable()
+	dbPath     = filepath.Join(filepath.Dir(appPath), "ouimap.db")
 )
 
 func downloadDatabase(url, tmp string) error {
 	resp, err := http.Get(url)
 	if err != nil {
-		return fmt.Errorf("HTTP request failed: %w", err)
+		// return fmt.Errorf("HTTP request failed: %w", err)
+		return fmt.Errorf("%s!%s unable to check for database updates", red, reset)
 	}
 	defer func() {
 		if closeErr := resp.Body.Close(); closeErr != nil {
@@ -114,7 +126,7 @@ func replaceDatabase(db, tmp string) error {
 
 func updateDatabase() (bool, error) {
 
-	info, err := os.Stat(dbStorageFile)
+	info, err := os.Stat(dbPath)
 	if err == nil {
 		if time.Since(info.ModTime()) < 7*24*time.Hour {
 			return false, nil
@@ -123,17 +135,76 @@ func updateDatabase() (bool, error) {
 		return false, err
 	}
 
-	if err := downloadDatabase(dbUpdateURL, dbDownloadFile); err != nil {
+	if err := downloadDatabase(dbUpdateURL, dbUpdateTMP); err != nil {
 		return false, fmt.Errorf("failed to download OUI database: %w", err)
 	}
 
-	if err := checkDatabase(dbDownloadFile); err != nil {
+	if err := checkDatabase(dbUpdateTMP); err != nil {
 		return false, fmt.Errorf("integrity check failed: %w", err)
 	}
 
-	if err := replaceDatabase(dbStorageFile, dbDownloadFile); err != nil {
+	if err := replaceDatabase(dbPath, dbUpdateTMP); err != nil {
 		return false, fmt.Errorf("failed to replace database: %w", err)
 	}
 
 	return true, nil
+}
+
+type githubRelease struct {
+	TagName string `json:"tag_name"`
+}
+
+func checkNewVersion(owner, repo, currentVersion string) (bool, string) {
+	url := fmt.Sprintf(baseAPIURL, owner, repo)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		// fmt.Printf("HTTP request failed: %v\n", err)
+		fmt.Printf("%s!%s unable to check for software updates\n", red, reset)
+		return false, ""
+	}
+	httpUserAgent := fmt.Sprintf("OUImap/%s", appVersion)
+	req.Header.Set("User-Agent", httpUserAgent)
+
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		// fmt.Printf("HTTP request failed: %v\n", err)
+		fmt.Printf("%s!%s unable to check for database updates\n", red, reset)
+		return false, ""
+	}
+
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode != http.StatusOK {
+		fmt.Printf("Unexpected status code: %d\n", resp.StatusCode)
+		return false, ""
+	}
+
+	var release githubRelease
+	if err := json.NewDecoder(resp.Body).Decode(&release); err != nil {
+		fmt.Printf("Failed to decode response: %v\n", err)
+		return false, ""
+	}
+
+	latestVersion := release.TagName
+
+	if !strings.HasPrefix(latestVersion, "v") {
+		latestVersion = "v" + latestVersion
+	}
+	if !strings.HasPrefix(currentVersion, "v") {
+		currentVersion = "v" + currentVersion
+	}
+
+	if semver.IsValid(latestVersion) && semver.IsValid(currentVersion) {
+		cmp := semver.Compare(latestVersion, currentVersion)
+		if cmp > 0 {
+			return true, latestVersion
+		}
+	} else {
+		fmt.Printf("Invalid version format. currentVersion: %s, latestVersion: %s\n", currentVersion, latestVersion)
+	}
+
+	return false, latestVersion
 }
