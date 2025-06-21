@@ -34,8 +34,8 @@ Visit https://www.gnu.org/licenses/gpl-3.0.html for details.`
 )
 
 var (
-	appVersion string
-	appBuild   string
+	appVersion   string
+	buildVersion string
 )
 
 var (
@@ -49,7 +49,7 @@ var (
 func main() {
 
 	fmt.Println()
-	fmt.Println(blue + appTitle + " " + appVersion + "+build.g" + appBuild + " (" + appOS + "/" + appArch + ") " + reset)
+	fmt.Println(blue + appTitle + " " + appVersion + "+build.g" + buildVersion + " (" + appOS + "/" + appArch + ") " + reset)
 	fmt.Println(blue + appCopyright + reset)
 	fmt.Println(blue + appLicense + reset)
 	fmt.Println()
@@ -65,10 +65,11 @@ func main() {
 
 	isNewer, latestVersion := checkNewVersion(githubOwner, githubRepo, appVersion)
 	if isNewer {
-		fmt.Printf("%sA new version of OUImap (%s) is available at https://github.com/%s/%s\n%s", yellow, latestVersion, githubOwner, githubRepo, reset)
+		url := fmt.Sprintf(baseRepoURL, githubOwner, githubRepo)
+		fmt.Printf("%sA new version of OUImap (%s) is available at %s\n%s", yellow, latestVersion, url, reset)
 	}
 
-	if err := loadOUIDatabase(dbStorageFile); err != nil {
+	if err := loadOUIDatabase(dbPath); err != nil {
 		fmt.Printf(red+"Failed to load OUI data: %s\n"+reset, err)
 		return
 	}

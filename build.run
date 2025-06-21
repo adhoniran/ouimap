@@ -1,1 +1,1 @@
-go build -ldflags "-X main.appVersion=$(git describe --tags  --abbrev=0) -X main.appBuild=$(git rev-parse --short HEAD)" .
+go build -ldflags "-X main.appVersion=$(git describe --tags  --abbrev=0) -X main.buildVersion=$(git rev-parse --short HEAD)" .
