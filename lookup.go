@@ -120,25 +120,6 @@ func parseOUIEntry(entry string) (ouiInfo, error) {
 	return result, nil
 }
 
-func promptSearchParams() []string {
-	var searchParams []string
-	scanner := bufio.NewScanner(os.Stdin)
-
-	for {
-		if !scanner.Scan() {
-			break
-		}
-		line := strings.TrimSpace(scanner.Text())
-		if line == "" {
-			break
-		}
-		searchParams = append(searchParams, line)
-	}
-
-	fmt.Println("Searching...")
-	return searchParams
-}
-
 func lookupOUIData(searchParams []string) [][]string {
 	var results [][]string
 

@@ -16,10 +16,12 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"golang.org/x/term"
 	"os"
 	"runtime"
+	"strings"
 	"time"
 )
 
@@ -89,7 +91,7 @@ func promptContinue() {
 
 	for {
 
-		searchParams := promptSearchParams()
+		searchParams := getSearchParameters()
 
 		startTime := time.Now()
 		searchParams = deduplicateInput(searchParams)
@@ -106,7 +108,33 @@ func promptContinue() {
 		fmt.Printf(blue+">> "+reset+"Search completed in %s.\n", elapsedTime)
 		fmt.Println()
 
+		if len(os.Args) > 1 {
+			break
+		}
+
 	}
+}
+
+func getSearchParameters() []string {
+	var searchParams []string
+
+	if len(os.Args) > 1 {
+		searchParams = os.Args[1:]
+	} else {
+		scanner := bufio.NewScanner(os.Stdin)
+		for {
+			if !scanner.Scan() {
+				break
+			}
+			line := strings.TrimSpace(scanner.Text())
+			if line == "" {
+				break
+			}
+			searchParams = append(searchParams, line)
+		}
+	}
+	fmt.Println("Searching...")
+	return searchParams
 }
 
 func init() {
