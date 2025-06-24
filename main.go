@@ -76,12 +76,14 @@ func main() {
 		return
 	}
 
-	fmt.Print(`
+	if len(os.Args) == 1 {
+		fmt.Print(`
 Enter a multi-line list of OUIs, MAC addresses and/or descriptions. Separate OUI/MAC address parts with colons, hyphens or periods.
 Press ENTER on a blank line to start the search, or CTRL+C to exit.
 
 
 `)
+	}
 
 	promptContinue()
 
@@ -91,7 +93,7 @@ func promptContinue() {
 
 	for {
 
-		searchParams := getSearchParameters()
+		searchParams := getSearchParams()
 
 		startTime := time.Now()
 		searchParams = deduplicateInput(searchParams)
@@ -115,7 +117,7 @@ func promptContinue() {
 	}
 }
 
-func getSearchParameters() []string {
+func getSearchParams() []string {
 	var searchParams []string
 
 	if len(os.Args) > 1 {

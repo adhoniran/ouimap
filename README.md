@@ -2,6 +2,7 @@
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=adhoniran_ouimap&metric=alert_status)](https://sonarcloud.io/dashboard?id=adhoniran_ouimap)
 [![Donate with PayPal](https://img.shields.io/badge/Donate%20with-PayPal-blue?logo=paypal&logoColor=white)](https://www.paypal.com/donate/?business=N6AH25Q2D4BL8&no_recurring=0&item_name=Contribute+to+the+future+of+our+projects.+Your+donation+via+PayPal+empowers+us+to+keep+creating+and+growing...+Thank+you%21&currency_code=USD)
+[![Download](https://img.shields.io/badge/Download-Latest-red?logo=github)](https://github.com/adhoniran/ouimap/releases/latest)
 
 OUImap is a command-line (CLI) tool for querying Organizationally Unique Identifier (OUI) information and MAC address prefixes from an always up-to-date Wireshark database. It allows you to quickly look up which vendor is associated with a given MAC address (or part of it) and also supports text-based searches for vendor names.
 
@@ -19,11 +20,15 @@ OUImap is a command-line (CLI) tool for querying Organizationally Unique Identif
 
 ## Overview
 
-OUImap is designed for developers, network analysts, and enthusiasts who need to quickly identify the vendor of a complete or partial MAC address. It downloads the vendor database from Wireshark, keeps a local copy for reference, and provides an interactive search mode.
+OUImap is designed for developers, network analysts and enthusiasts who need to quickly identify the vendor of a complete or partial MAC address. It downloads the vendor database from Wireshark, keeps a local copy for reference, and provides an interactive search mode.
 
 ## Main Features
 
-- Automatic download of the Wireshark vendor database
+- Cross-platform support: Linux, macOS and Windows
+- Multi-architecture: AMD64 and ARM64 support
+- Quick mode: Pass search terms directly as command-line arguments for quick lookups
+- Interactive mode: Multi-line input interface for complex searches
+- Weekly automatic download of the Wireshark vendor database
 - Integrity check of the downloaded database file
 - Local storage and automatic database update
 - MAC prefix (OUI) lookups in standardized formats (XX:XX:XX)
@@ -31,6 +36,8 @@ OUImap is designed for developers, network analysts, and enthusiasts who need to
 - Text-based search for vendor names (e.g., “Intel,” “Dell”)
 - Detailed results, including the search time and the total number of records found
 - Simple and interactive command-line tool
+- Automatic version checking: Notifies when new versions are available
+
 
 ## Build
 
@@ -76,29 +83,28 @@ This will produce the “ouimap” executable (or “ouimap.exe” on Windows) i
 ### Step 3: Run
 
 On Linux or macOS:
-```bash
+```
 ./ouimap
 ```
 
 On Windows:
-```powershell
+```
 .\ouimap.exe
 ```
 
 ## Usage
 
-When running OUImap, you can provide your search parameters interactively.
+When running OUImap, you can provide your search parameters interactively or by command line parameters.
 
-1. Open a terminal and run the OUImap binary.
-2. Enter a list of MAC addresses, prefixes, and/or vendor names (one per line).
-3. Press Enter on a blank line to start the search.
-4. Review the results that display the matching vendors and prefix ranges.
+1. Open a terminal and execute OUImap passing the MAC address and/or vendor name list.
+2. Check the results to see which vendors and OUI ranges matched your query.
 
 ## Execution Example
 
-```bash
+```
 $ ./ouimap
-
+```
+```
 The OUImap tool simplifies looking up OUIs and MAC address prefixes...
 
 # Enter each search term pressing ENTER for a new term:
@@ -120,8 +126,30 @@ Searching...
 
 # Press CTRL+C to exit:
 ```
+or
 
-If no results are found, the tool will display a message indicating that no matches were found.
+```
+$ ./ouimap 00-50-56 'atari, inc' 00:90:75:00:1A:BC
+```
+```
+OUImap +build.g (windows/amd64) 
+Copyright © 2025 Adhoniran Gomes
+This program comes with ABSOLUTELY NO WARRANTY.
+This is free software, and you are welcome to redistribute it under certain conditions;
+Visit https://www.gnu.org/licenses/gpl-3.0.html for details.
+
+Searching...
+
+00:50:56:00:00:00/24      VMware, Inc.
+44:03:77:10:00:00/28      Atari, Inc.
+00:90:75:00:00:00/24      Nec Do Brasil S.A.
+
+>> 3 record(s) found from your search parameters...
+>> Search completed in 1.142ms.
+
+# Press CTRL+C to exit:
+
+```
 
 ## Automatic Updates
 
