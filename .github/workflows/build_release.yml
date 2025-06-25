@@ -78,8 +78,8 @@ jobs:
           GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} \
           go build -ldflags "-X main.appVersion=${{ env.VERSION }} -X main.appBuild=${{ env.COMMIT }}" -o "$FILE" .
 
-          # Copy ouimap.db to the output directory
-          cp ouimap.db "$OUTPUT_DIR/"
+          # Copy manuf.gz to the output directory
+          cp manuf.gz "$OUTPUT_DIR/"
         
       # Compress the output directory into a zip (Windows/macOS) or tar.gz (Linux)
       - name: Compress outputs
