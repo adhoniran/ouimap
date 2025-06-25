@@ -76,7 +76,7 @@ jobs:
           echo "Compiling for OS: ${{ matrix.os }}, Architecture: ${{ matrix.arch }}, Version: ${{ env.VERSION }}"
 
           GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} \
-          go build -ldflags "-X main.appVersion=${{ env.VERSION }} -X main.appBuild=${{ env.COMMIT }}" -o "$FILE" .
+          go build -ldflags "-X main.version=${{ env.VERSION }} -X main.build=${{ env.COMMIT }}" -o "$FILE" .
 
           # Copy manuf.gz to the output directory
           cp manuf.gz "$OUTPUT_DIR/"
