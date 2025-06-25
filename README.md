@@ -105,26 +105,30 @@ When running OUImap, you can provide your search parameters interactively or by 
 $ ./ouimap
 ```
 ```
-The OUImap tool simplifies looking up OUIs and MAC address prefixes...
+OUImap v1.2.0+build.g6ab869e (windows/amd64) 
+Copyright © 2025 Adhoniran Gomes
+This program comes with ABSOLUTELY NO WARRANTY.
+This is free software, and you are welcome to redistribute it under certain conditions;
+Visit https://www.gnu.org/licenses/gpl-3.0.html for details.
 
-# Enter each search term pressing ENTER for a new term:
+
+Enter a multi-line list of OUIs, MAC addresses and/or descriptions. Separate OUI/MAC address parts with colons, hyphens or periods.
+Press ENTER on a blank line to start the search, or CTRL+C to exit.
+
 
 suse linux
 0050.56
 00-19-1D-0F-DA-08
 
-# Press ENTER on a blank line to start the search:
-
 Searching...
 
-0C:FD:37:00:00:00/24      SUSE Linux
-00:50:56:00:00:00/24      VMware, Inc.
-00:19:1D:00:00:00/24      Nintendo Co., Ltd.
-
+0C:FD:37:00:00:00/24      SUSE Linux GmbH                                                                                                                                                                                           
+00:50:56:00:00:00/24      VMware, Inc.                                                                                                                                                                                              
+00:19:1D:00:00:00/24      Nintendo Co., Ltd.                                                                                                                                                                                        
+                                                                                                                                                                                                                                    
 >> 3 record(s) found from your search parameters...
->> Search completed in 253.819µs.
+>> Search completed in 2.1153ms.
 
-# Press CTRL+C to exit:
 ```
 or
 
@@ -132,7 +136,7 @@ or
 $ ./ouimap 00-50-56 'atari, inc' 00:90:75:00:1A:BC
 ```
 ```
-OUImap +build.g (windows/amd64) 
+OUImap v1.2.0+build.g6ab869e (windows/amd64) 
 Copyright © 2025 Adhoniran Gomes
 This program comes with ABSOLUTELY NO WARRANTY.
 This is free software, and you are welcome to redistribute it under certain conditions;
@@ -145,9 +149,7 @@ Searching...
 00:90:75:00:00:00/24      Nec Do Brasil S.A.
 
 >> 3 record(s) found from your search parameters...
->> Search completed in 1.142ms.
-
-# Press CTRL+C to exit:
+>> Search completed in 2.1345ms.
 
 ```
 
