@@ -69,7 +69,7 @@ func main() {
 		url := fmt.Sprintf(urlBaseRepo, githubOwner, githubRepo)
 		fmt.Printf("%sA new version of OUImap (%s) is available at %s\n%s", yellow, verLatest, url, reset)
 	}
-	
+
 	if err := loadOUIDatabase(dbPath); err != nil {
 		fmt.Printf(red+"Failed to load OUI data: %s\n"+reset, err)
 		return
@@ -134,6 +134,7 @@ func getSearchParams() []string {
 			searchParams = append(searchParams, line)
 		}
 	}
+	fmt.Println()
 	fmt.Println("Searching...")
 	return searchParams
 }
