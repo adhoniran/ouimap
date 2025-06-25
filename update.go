@@ -32,7 +32,7 @@ import (
 
 const (
 	dbUpdateURL = "https://www.wireshark.org/download/automated/data/manuf.gz"
-	dbUpdateTMP = "ouimap.dl"
+	dbUpdateTMP = "manuf.tmp"
 	githubOwner = "adhoniran"
 	githubRepo  = "ouimap"
 	baseRepoURL = "https://github.com/%s/%s"
@@ -41,7 +41,7 @@ const (
 
 var (
 	appPath, _ = os.Executable()
-	dbPath     = filepath.Join(filepath.Dir(appPath), "ouimap.db")
+	dbPath     = filepath.Join(filepath.Dir(appPath), "manuf.gz")
 )
 
 func downloadDatabase(url, tmp string) error {
@@ -203,7 +203,10 @@ func checkNewVersion(owner, repo, currentVersion string) (bool, string) {
 			return true, latestVersion
 		}
 	} else {
-		fmt.Printf("Invalid version format. currentVersion: %s, latestVersion: %s\n", currentVersion, latestVersion)
+		url := fmt.Sprintf(baseRepoURL, githubOwner, githubRepo)
+		fmt.Printf("Check for new versions at %s\n", url)
+		return false, latestVersion
+
 	}
 
 	return false, latestVersion
