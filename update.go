@@ -75,6 +75,13 @@ func downloadDatabase(url, tmp string) error {
 		progressbar.OptionSetDescription("Downloading OUI database"),
 		progressbar.OptionShowCount(),
 		progressbar.OptionShowBytes(true),
+		// progressbar.OptionSetTheme(progressbar.Theme{
+		// Saucer:        "|",
+		// SaucerHead:    "|",
+		// SaucerPadding: " ",
+		// BarStart:      "[",
+		// BarEnd:        "]",
+		// }),
 	)
 
 	if _, err = io.Copy(io.MultiWriter(tmpFile, bar), resp.Body); err != nil {
@@ -204,7 +211,7 @@ func checkNewVersion(owner, repo, currentVersion string) (bool, string) {
 		}
 	} else {
 		url := fmt.Sprintf(urlBaseRepo, githubOwner, githubRepo)
-		fmt.Printf("Check for new version at %s\n", url)
+		fmt.Printf("Check for a new OUImap version at %s\n", url)
 		return false, latestVersion
 
 	}
