@@ -26,18 +26,17 @@ import (
 )
 
 const (
-	appTitle     string = "OUImap"
-	appArch             = runtime.GOARCH
-	appOS               = runtime.GOOS
-	appCopyright string = "Copyright © 2025 Adhoniran Gomes"
-	appLicense   string = `This program comes with ABSOLUTELY NO WARRANTY.
+	goarch           = runtime.GOARCH
+	goos             = runtime.GOOS
+	copyright string = "Copyright © 2025 Adhoniran Gomes"
+	license   string = `This program comes with ABSOLUTELY NO WARRANTY.
 This is free software, and you are welcome to redistribute it under certain conditions;
 Visit https://www.gnu.org/licenses/gpl-3.0.html for details.`
 )
 
 var (
-	appVersion   string
-	buildVersion string
+	version string
+	build   string
 )
 
 var (
@@ -51,26 +50,26 @@ var (
 func main() {
 
 	fmt.Println()
-	fmt.Println(blue + appTitle + " " + appVersion + "+build.g" + buildVersion + " (" + appOS + "/" + appArch + ") " + reset)
-	fmt.Println(blue + appCopyright + reset)
-	fmt.Println(blue + appLicense + reset)
+	fmt.Println(blue + "OUImap " + version + "+build.g" + build + " (" + goos + "/" + goarch + ") " + reset)
+	fmt.Println(blue + copyright + reset)
+	fmt.Println(blue + license + reset)
 	fmt.Println()
 
-	updated, err := updateDatabase()
+	dbUpdated, err := updateDatabase()
 	if err != nil {
 		fmt.Println(err)
 	}
-	if updated {
+	if dbUpdated {
 		fmt.Println()
 		fmt.Println(green + "OUI database updated successfully!" + reset)
 	}
 
-	isNewer, latestVersion := checkNewVersion(githubOwner, githubRepo, appVersion)
-	if isNewer {
-		url := fmt.Sprintf(baseRepoURL, githubOwner, githubRepo)
-		fmt.Printf("%sA new version of OUImap (%s) is available at %s\n%s", yellow, latestVersion, url, reset)
+	verNew, verLatest := checkNewVersion(githubOwner, githubRepo, version)
+	if verNew {
+		url := fmt.Sprintf(urlBaseRepo, githubOwner, githubRepo)
+		fmt.Printf("%sA new version of OUImap (%s) is available at %s\n%s", yellow, verLatest, url, reset)
 	}
-
+	
 	if err := loadOUIDatabase(dbPath); err != nil {
 		fmt.Printf(red+"Failed to load OUI data: %s\n"+reset, err)
 		return

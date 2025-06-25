@@ -31,17 +31,17 @@ import (
 )
 
 const (
-	dbUpdateURL = "https://www.wireshark.org/download/automated/data/manuf.gz"
-	dbUpdateTMP = "manuf.tmp"
+	urlDbUpdate = "https://www.wireshark.org/download/automated/data/manuf.gz"
 	githubOwner = "adhoniran"
 	githubRepo  = "ouimap"
-	baseRepoURL = "https://github.com/%s/%s"
-	baseAPIURL  = "https://api.github.com/repos/%s/%s/releases/latest"
+	urlBaseRepo = "https://github.com/%s/%s"
+	urlBaseAPI  = "https://api.github.com/repos/%s/%s/releases/latest"
 )
 
 var (
-	appPath, _ = os.Executable()
-	dbPath     = filepath.Join(filepath.Dir(appPath), "manuf.gz")
+	exePath, _ = os.Executable()
+	dbPath     = filepath.Join(filepath.Dir(exePath), "manuf.gz")
+	dbTemp     = filepath.Join(filepath.Dir(exePath), "manuf.tmp")
 )
 
 func downloadDatabase(url, tmp string) error {
@@ -135,15 +135,15 @@ func updateDatabase() (bool, error) {
 		return false, err
 	}
 
-	if err := downloadDatabase(dbUpdateURL, dbUpdateTMP); err != nil {
+	if err := downloadDatabase(urlDbUpdate, dbTemp); err != nil {
 		return false, fmt.Errorf("failed to download OUI database: %w", err)
 	}
 
-	if err := checkDatabase(dbUpdateTMP); err != nil {
+	if err := checkDatabase(dbTemp); err != nil {
 		return false, fmt.Errorf("integrity check failed: %w", err)
 	}
 
-	if err := replaceDatabase(dbPath, dbUpdateTMP); err != nil {
+	if err := replaceDatabase(dbPath, dbTemp); err != nil {
 		return false, fmt.Errorf("failed to replace database: %w", err)
 	}
 
@@ -155,14 +155,14 @@ type githubRelease struct {
 }
 
 func checkNewVersion(owner, repo, currentVersion string) (bool, string) {
-	url := fmt.Sprintf(baseAPIURL, owner, repo)
+	url := fmt.Sprintf(urlBaseAPI, owner, repo)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		// fmt.Printf("HTTP request failed: %v\n", err)
 		fmt.Printf("%s!%s unable to check for software updates\n", red, reset)
 		return false, ""
 	}
-	httpUserAgent := fmt.Sprintf("OUImap/%s", appVersion)
+	httpUserAgent := fmt.Sprintf("OUImap/%s", version)
 	req.Header.Set("User-Agent", httpUserAgent)
 
 	client := &http.Client{
@@ -203,8 +203,8 @@ func checkNewVersion(owner, repo, currentVersion string) (bool, string) {
 			return true, latestVersion
 		}
 	} else {
-		url := fmt.Sprintf(baseRepoURL, githubOwner, githubRepo)
-		fmt.Printf("Check for new versions at %s\n", url)
+		url := fmt.Sprintf(urlBaseRepo, githubOwner, githubRepo)
+		fmt.Printf("Check for new version at %s\n", url)
 		return false, latestVersion
 
 	}
